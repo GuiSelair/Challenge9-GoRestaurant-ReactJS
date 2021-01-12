@@ -55,21 +55,32 @@ const Dashboard: React.FC = () => {
       ...food,
     });
 
-    const response = await api.put<IFoodPlate>(
+    const { data: updatedFood } = await api.put<IFoodPlate>(
       `/foods/${editingFood.id}`,
       food,
     );
 
-    // console.log(foods, response.data.id);
-    // foods.splice(response.data.id - 1, 0);
+    const foodsLessUpdatedFood = foods.filter(
+      findFood => findFood.id !== editingFood.id,
+    );
 
-    // console.log(foods, response.data.id);
-
-    // setFoods([...foods, response.data]);
+    setFoods([
+      ...foodsLessUpdatedFood,
+      {
+        id: updatedFood.id,
+        name: updatedFood.name,
+        image: updatedFood.image,
+        price: updatedFood.price,
+        description: updatedFood.description,
+        available: updatedFood.available,
+      },
+    ]);
   }
 
   async function handleDeleteFood(id: number): Promise<void> {
-    console.log(id);
+    await api.delete(`/foods/${id}`);
+    const newFoods = foods.filter(findFood => findFood.id !== id);
+    setFoods(newFoods);
   }
 
   function toggleModal(): void {
